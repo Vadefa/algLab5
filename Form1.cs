@@ -35,6 +35,7 @@ namespace algLab4
 
             private bool is_spanning = false;
             public bool is_gone = false;
+            public bool is_printed = false;
             private List<Ver> vers;
 
             public void make_spanning()
@@ -58,7 +59,7 @@ namespace algLab4
             
             public void paint(Graphics paintForm)
             {
-                if (vers[0].is_gone == true && vers[1].is_gone == true)
+                if (is_printed == true)
                     paintForm.DrawLine(spanningPen, p1, p2);
                 else
                     paintForm.DrawLine(defaultPen, p1, p2);
@@ -134,6 +135,17 @@ namespace algLab4
                     if (e.are_Connected(this, v))
                     {
                         e.is_gone = true;
+                        break;
+                    }
+                }
+            }
+            public void edgePrinted(Ver v)
+            {
+                foreach (Edge e in edges)
+                {
+                    if (e.are_Connected(this, v))
+                    {
+                        e.is_printed = true;
                         break;
                     }
                 }
@@ -485,6 +497,8 @@ namespace algLab4
                 Stack<Ver> stec = new Stack<Ver>();
                 Stack<Ver> ce = new Stack<Ver>();
                 stec.Push(storage[0]);
+
+                List<Ver> paintList = new List<Ver>();
                 Ver ver;
                 while (stec.Count != 0)
                 {
@@ -514,19 +528,22 @@ namespace algLab4
                     {
                         ver = stec.Pop();
                         ce.Push(ver);
+                        paintList.Add(ver);
                     }
                 }
-                ce.Peek().is_gone = true;
-                string path = ce.Pop().name;
 
-                count = ce.Count;
-                for (int i = 0; i < count; i++)
+                for(int i = paintList.Count - 1; i >=1; i--)
                 {
-                    ce.Peek().is_gone = true;
-                    path += " - " + ce.Pop().name;
+                    paintList[i - 1].edgePrinted(paintList[i]);
                     paint(paintForm);
                     Thread.Sleep(750);
                 }
+
+                string path = ce.Pop().name;
+                count = ce.Count;
+
+                for (int i = 0; i < count; i++)
+                    path += " - " + ce.Pop().name;
                 return path;
             }
         }

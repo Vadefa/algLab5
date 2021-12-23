@@ -61,10 +61,9 @@ namespace algLab4
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(103, 29);
+            this.label1.Location = new System.Drawing.Point(103, 3);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(0, 20);
+            this.label1.Size = new System.Drawing.Size(210, 73);
             this.label1.TabIndex = 5;
             // 
             // button2
@@ -99,7 +98,6 @@ namespace algLab4
             this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseClick);
             this.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.Form1_DoubleClick);
             this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
             this.ResumeLayout(false);
 
         }
