@@ -58,10 +58,10 @@ namespace algLab4
             
             public void paint(Graphics paintForm)
             {
-                if (is_spanning == false)
-                    paintForm.DrawLine(defaultPen, p1, p2);
-                else
+                if (vers[0].is_gone == true && vers[1].is_gone == true)
                     paintForm.DrawLine(spanningPen, p1, p2);
+                else
+                    paintForm.DrawLine(defaultPen, p1, p2);
             }
             public Edge(Point p1, Point p2, Ver ver1, Ver ver2, Graphics paintForm)
             {
@@ -137,6 +137,16 @@ namespace algLab4
                         break;
                     }
                 }
+            }
+            public bool checkEdgeGone(Ver v)
+            {
+                foreach(Edge e in edges)
+                {
+                    if (e.are_Connected(this, v))
+                        if (e.is_gone == true)
+                            return true;
+                }
+                return false;
             }
             public void neighbourRemove(Ver ver, List<Edge> edges)
             {
@@ -465,19 +475,20 @@ namespace algLab4
                     return true;
             }
 
+
             public string eulerian(Graphics paintForm)
             {
                 foreach (Ver v in storage)
                     if (v.neighbours.Count % 2 != 0)
-                        return "Граф не содержит эйлеров путь:\nне все вершины имеют чётную степень";
+                        return "Граф не содержит эйлеров цикл:\nне все вершины имеют чётную степень";
 
-                List<Ver> stec = new List<Ver>();
-                List<Ver> ce = new List<Ver>();
-                stec.Add(storage[0]);
+                Stack<Ver> stec = new Stack<Ver>();
+                Stack<Ver> ce = new Stack<Ver>();
+                stec.Push(storage[0]);
                 Ver ver;
                 while (stec.Count != 0)
                 {
-                    ver = stec[0];
+                    ver = stec.Peek();
                     bool has_edges = false;
                     foreach (Edge e in ver.edges)
                     {
@@ -490,27 +501,32 @@ namespace algLab4
                     if (has_edges == true)
                     {
                         foreach (Ver v in ver.neighbours)
-                            if (stec.Contains(v) == false && v.is_gone == false)
+                        {
+                            if (ver.checkEdgeGone(v) == false)
                             {
-                                stec.Add(v);
+                                stec.Push(v);
                                 ver.edgeGone(v);
                                 break;
                             }
-                            else if (stec.Contains(v) == true)
-                            {
-                                ver.edgeGone(v);
-                            }
+                        }
                     }
                     else
                     {
-                        ce.Add(ver);
-                        stec.Remove(ver);
-                        ver.is_gone = true;
+                        ver = stec.Pop();
+                        ce.Push(ver);
                     }
                 }
-                string path = ce[0].name;
-                for (int i = 1; i < ce.Count; i++)
-                    path += " - " + ce[i].name;
+                ce.Peek().is_gone = true;
+                string path = ce.Pop().name;
+
+                count = ce.Count;
+                for (int i = 0; i < count; i++)
+                {
+                    ce.Peek().is_gone = true;
+                    path += " - " + ce.Pop().name;
+                    paint(paintForm);
+                    Thread.Sleep(750);
+                }
                 return path;
             }
         }
