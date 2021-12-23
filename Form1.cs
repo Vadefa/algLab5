@@ -34,6 +34,7 @@ namespace algLab4
             private Pen spanningPen = new Pen(Color.Red, 6);        // для остовного дерева
 
             private bool is_spanning = false;
+            public bool is_gone = false;
             private List<Ver> vers;
 
             public void make_spanning()
@@ -99,6 +100,7 @@ namespace algLab4
             public List<Ver> neighbours = new List<Ver>();
 
             public bool is_spanned = false;
+            public bool is_gone = false;
 
             //drawing method
             public void paint(Graphics paintForm)
@@ -124,6 +126,17 @@ namespace algLab4
             public void edgeRemove(Edge edge)
             {
                 edges.Remove(edge);
+            }
+            public void edgeGone(Ver v)
+            {
+                foreach (Edge e in edges)
+                {
+                    if (e.are_Connected(this, v))
+                    {
+                        e.is_gone = true;
+                        break;
+                    }
+                }
             }
             public void neighbourRemove(Ver ver, List<Edge> edges)
             {
@@ -381,22 +394,22 @@ namespace algLab4
                         circle.paint(paintForm);
             }
 
-            public void paintSpan(List<Ver> L, Graphics paintForm)
-            {
-                for (int i = 0; i < L.Count - 1; i++)
-                    for (int j = i + 1; j < L.Count; j++)
-                        if (L[i].neighbourCheck(L[j]) == true)
-                        {
-                            L[i].span(L[j], paintForm);
-                            paint(paintForm);
-                            Thread.Sleep(500);
-                        }
-                        else
-                        {
-                            L[i].is_spanned = true;
-                            continue;
-                        }
-            }
+            //public void paintSpan(List<Ver> L, Graphics paintForm)
+            //{
+            //    for (int i = 0; i < L.Count - 1; i++)
+            //        for (int j = i + 1; j < L.Count; j++)
+            //            if (L[i].neighbourCheck(L[j]) == true)
+            //            {
+            //                L[i].span(L[j], paintForm);
+            //                paint(paintForm);
+            //                Thread.Sleep(500);
+            //            }
+            //            else
+            //            {
+            //                L[i].is_spanned = true;
+            //                continue;
+            //            }
+            //}
 
             public void inWidth(Ver ver, List<Ver> Och, List<Ver> L)
             {
@@ -417,12 +430,12 @@ namespace algLab4
 
 
             }
-            public string inWidthPrep(Graphics paintForm)
+            public bool inWidthPrep(Graphics paintForm)
             {
                 if (count == 0)
-                    return "";
+                    return false;
 
-                List <Ver> Och = new List<Ver>();
+                List<Ver> Och = new List<Ver>();
                 List<Ver> L = new List<Ver>();
 
                 bool found = false;
@@ -446,27 +459,59 @@ namespace algLab4
                 if (L.Count != count)
                 {
                     MessageBox.Show("Граф несвязный.");
-                    return "нет";
-                    // расписать обход какого-либо графа в ширину
-                    // представить граф в виде матрицы инцеденций
-                    // недостатки матрицы инцеденций
+                    return false;
                 }
                 else
+                    return true;
+            }
+
+            public string eulerian(Graphics paintForm)
+            {
+                foreach (Ver v in storage)
+                    if (v.neighbours.Count % 2 != 0)
+                        return "Граф не содержит эйлеров путь:\nне все вершины имеют чётную степень";
+
+                List<Ver> stec = new List<Ver>();
+                List<Ver> ce = new List<Ver>();
+                stec.Add(storage[0]);
+                Ver ver;
+                while (stec.Count != 0)
                 {
-                    paintSpan(L, paintForm);
-
-                    foreach (Ver v in storage)
-                        v.is_spanned = false;
-
-                    foreach (Edge e in edges)
-                        e.make_default();
-
-                    string res = "";
-                    foreach (Ver v in L)
-                        res += v.name;
-
-                    return res;
+                    ver = stec[0];
+                    bool has_edges = false;
+                    foreach (Edge e in ver.edges)
+                    {
+                        if (e.is_gone == false)
+                        {
+                            has_edges = true;
+                            break;
+                        }
+                    }
+                    if (has_edges == true)
+                    {
+                        foreach (Ver v in ver.neighbours)
+                            if (stec.Contains(v) == false && v.is_gone == false)
+                            {
+                                stec.Add(v);
+                                ver.edgeGone(v);
+                                break;
+                            }
+                            else if (stec.Contains(v) == true)
+                            {
+                                ver.edgeGone(v);
+                            }
+                    }
+                    else
+                    {
+                        ce.Add(ver);
+                        stec.Remove(ver);
+                        ver.is_gone = true;
+                    }
                 }
+                string path = ce[0].name;
+                for (int i = 1; i < ce.Count; i++)
+                    path += " - " + ce[i].name;
+                return path;
             }
         }
         ///////// ended up for the storages and Ver classes
@@ -504,11 +549,8 @@ namespace algLab4
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string res = storage.inWidthPrep(paintForm);
-            if (res != "")
-                label1.Text = "Путь: " + res;
-            else
-                label1.Text = "";
+            if (storage.inWidthPrep(paintForm) == true)
+                label1.Text = storage.eulerian(paintForm);
         }
 
         private void button3_Click(object sender, EventArgs e)
