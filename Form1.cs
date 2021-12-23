@@ -15,14 +15,14 @@ namespace algLab4
     {
         StorService storage;
         Graphics paintForm;
-        char a;
+        int a;
         public Form1()
         {
             InitializeComponent();
-
+            
             paintForm = CreateGraphics();
             storage = new StorService();
-            a = (char)65;
+            a = 1;
         }
 
         public class Edge
@@ -199,14 +199,14 @@ namespace algLab4
                 }
             }
 
-            public Ver(int x, int y, Graphics paintForm, char a)
+            public Ver(int x, int y, Graphics paintForm, string a)
             {
                 this.x = x - r - ((int)(focusedPen.Width / 2));
                 this.y = y - r - ((int)(focusedPen.Width / 2));
                 is_focused = true;
                 rect = new Rectangle(this.x, this.y, r * 2, r * 2);
 
-                name = a.ToString();
+                name = a;
                 name_size = 14;
                 name_x = x - name_size + ((int)(focusedPen.Width / 2));
                 name_y = y - name_size;
@@ -483,7 +483,7 @@ namespace algLab4
         {
             //PointToClient returns mouse position in relation to the form, not to the screen
             Point mousePos = PointToClient(new Point(Cursor.Position.X, Cursor.Position.Y));
-            storage.add(new Ver(mousePos.X, mousePos.Y, paintForm, a), paintForm);
+            storage.add(new Ver(mousePos.X, mousePos.Y, paintForm, a.ToString()), paintForm);
             a++;
         }
 
@@ -515,7 +515,7 @@ namespace algLab4
         {
             storage.remove();
             storage = new StorService();
-            a = (char)65;
+            a = 1;
             ActiveForm.Invalidate();
         }
     }
