@@ -494,17 +494,17 @@ namespace algLab4
                     if (v.neighbours.Count % 2 != 0)
                         return "Граф не содержит эйлеров цикл:\nне все вершины имеют чётную степень";
 
-                Stack<Ver> stec = new Stack<Ver>();
-                Stack<Ver> ce = new Stack<Ver>();
+                Stack<Ver> stec = new Stack<Ver>();                 // стек для очереди
+                Stack<Ver> ce = new Stack<Ver>();                   // стек для эйлерового цикла
                 stec.Push(storage[0]);
 
-                List<Ver> paintList = new List<Ver>();
+                List<Ver> paintList = new List<Ver>();              // список вершин для рисовки
                 Ver ver;
                 while (stec.Count != 0)
                 {
-                    ver = stec.Peek();
+                    ver = stec.Peek();                              // взяли верхнюю вершину стека
                     bool has_edges = false;
-                    foreach (Edge e in ver.edges)
+                    foreach (Edge e in ver.edges)                   // проверка на наличие у вершины инцидентных непосещённых рёбра
                     {
                         if (e.is_gone == false)
                         {
@@ -512,23 +512,23 @@ namespace algLab4
                             break;
                         }
                     }
-                    if (has_edges == true)
+                    if (has_edges == true)                          // если ещё остались непосещённые рёбра
                     {
                         foreach (Ver v in ver.neighbours)
                         {
-                            if (ver.checkEdgeGone(v) == false)
+                            if (ver.checkEdgeGone(v) == false)      // если ребро между v и ver не посещено
                             {
-                                stec.Push(v);
-                                ver.edgeGone(v);
+                                stec.Push(v);                       // занесли вершину в стек
+                                ver.edgeGone(v);                    // отметили ребро посещённым
                                 break;
                             }
                         }
                     }
-                    else
+                    else                                            // если все рёбра вершины уже посещены
                     {
-                        ver = stec.Pop();
-                        ce.Push(ver);
-                        paintList.Add(ver);
+                        ver = stec.Pop();                           // извлекаем вершину из стека очереди
+                        ce.Push(ver);                               // заносим вершину в стек эйлерового цикла
+                        paintList.Add(ver);                         // заносим вершину в список для рисовки
                     }
                 }
 
@@ -592,6 +592,7 @@ namespace algLab4
             storage = new StorService();
             a = 1;
             ActiveForm.Invalidate();
+            label1.Text = "";
         }
     }
 }
