@@ -493,7 +493,7 @@ namespace algLab4
                 foreach (Ver v in storage)
                     if (v.neighbours.Count % 2 != 0)
                         return "Граф не содержит эйлеров цикл: не все вершины имеют чётную степень";
-
+                
                 foreach (Ver v in storage)
                 {
                     v.is_gone = false;
@@ -504,6 +504,7 @@ namespace algLab4
                         e.is_printed = false;
                     }
                 }
+                ActiveForm.Invalidate();
 
                 Stack<Ver> stec = new Stack<Ver>();                 // стек для очереди
                 Stack<Ver> ce = new Stack<Ver>();                   // стек для эйлерового цикла
@@ -525,14 +526,26 @@ namespace algLab4
                     }
                     if (has_edges == true)                          // если ещё остались непосещённые рёбра
                     {
+                        Ver temp = ver;
+                        bool push = false;
                         foreach (Ver v in ver.neighbours)
                         {
                             if (ver.checkEdgeGone(v) == false)      // если ребро между v и ver не посещено
                             {
-                                stec.Push(v);                       // занесли вершину в стек
-                                ver.edgeGone(v);                    // отметили ребро посещённым
-                                break;
+                                if (temp != ver)
+                                {
+                                    if (temp.name[0] > v.name[0])   // найдём вершину с наименьшим именем
+                                        temp = v;
+                                }
+                                else
+                                    temp = v;
+                                push = true;
                             }
+                        }
+                        if (push == true)
+                        {
+                            stec.Push(temp);                       // занесли вершину в стек
+                            ver.edgeGone(temp);                    // отметили ребро посещённым
                         }
                     }
                     else                                            // если все рёбра вершины уже посещены
