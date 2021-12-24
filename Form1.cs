@@ -480,7 +480,7 @@ namespace algLab4
                 }
                 if (L.Count != count)
                 {
-                    MessageBox.Show("Граф несвязный.");
+                    MessageBox.Show("Граф несвязный, поэтому не содержит эйлеров цикл.");
                     return false;
                 }
                 else
@@ -492,7 +492,18 @@ namespace algLab4
             {
                 foreach (Ver v in storage)
                     if (v.neighbours.Count % 2 != 0)
-                        return "Граф не содержит эйлеров цикл:\nне все вершины имеют чётную степень";
+                        return "Граф не содержит эйлеров цикл: не все вершины имеют чётную степень";
+
+                foreach (Ver v in storage)
+                {
+                    v.is_gone = false;
+                    v.is_spanned = false;
+                    foreach (Edge e in v.edges)
+                    {
+                        e.is_gone = false;
+                        e.is_printed = false;
+                    }
+                }
 
                 Stack<Ver> stec = new Stack<Ver>();                 // стек для очереди
                 Stack<Ver> ce = new Stack<Ver>();                   // стек для эйлерового цикла
@@ -504,7 +515,7 @@ namespace algLab4
                 {
                     ver = stec.Peek();                              // взяли верхнюю вершину стека
                     bool has_edges = false;
-                    foreach (Edge e in ver.edges)                   // проверка на наличие у вершины инцидентных непосещённых рёбра
+                    foreach (Edge e in ver.edges)                   // проверка на наличие у вершины инцидентных непосещённых рёбер
                     {
                         if (e.is_gone == false)
                         {
