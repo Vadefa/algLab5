@@ -527,7 +527,6 @@ namespace algLab4
                     if (has_edges == true)                          // если ещё остались непосещённые рёбра
                     {
                         Ver temp = ver;
-                        bool push = false;
                         foreach (Ver v in ver.neighbours)
                         {
                             if (ver.checkEdgeGone(v) == false)      // если ребро между v и ver не посещено
@@ -539,14 +538,10 @@ namespace algLab4
                                 }
                                 else
                                     temp = v;
-                                push = true;
                             }
                         }
-                        if (push == true)
-                        {
-                            stec.Push(temp);                       // занесли вершину в стек
-                            ver.edgeGone(temp);                    // отметили ребро посещённым
-                        }
+                        stec.Push(temp);                       // занесли вершину в стек
+                        ver.edgeGone(temp);                    // отметили ребро посещённым
                     }
                     else                                            // если все рёбра вершины уже посещены
                     {
